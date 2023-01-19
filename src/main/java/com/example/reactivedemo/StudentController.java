@@ -18,7 +18,6 @@ import static org.springframework.web.reactive.function.server.RouterFunctions.r
 import static org.springframework.web.reactive.function.server.ServerResponse.ok;
 
 @Component
-//@Controller
 public class StudentController {
 
     @Autowired
@@ -39,7 +38,7 @@ public class StudentController {
                     Integer studentId = Integer.parseInt(req.pathVariable("id"));
                     Mono<Student> studentMono = req.bodyToMono(Student.class);
                     return studentService.updateStudent(studentId, studentMono)
-                            .flatMap(student -> ok()
+                            .flatMap(student -> ServerResponse.ok()
                                     .contentType(MediaType.APPLICATION_JSON)
                                     .body(Mono.just(student), Student.class))
                             .switchIfEmpty(ServerResponse.notFound()
@@ -49,7 +48,7 @@ public class StudentController {
 
     public Mono<ServerResponse> getAllStudents(ServerRequest request) {
         Flux<Student> students = studentService.getAllStudents();
-        return ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(students, Student.class);
     }
@@ -57,7 +56,7 @@ public class StudentController {
     public Mono<ServerResponse> getStudent(ServerRequest request) {
         Integer studentId = Integer.parseInt(request.pathVariable("id"));
         return studentService.getStudent(studentId)
-                .flatMap(student -> ok()
+                .flatMap(student -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(Mono.just(student), Student.class))
                 .switchIfEmpty(ServerResponse.notFound()
@@ -75,7 +74,7 @@ public class StudentController {
     public Mono<ServerResponse> updateStudent(ServerRequest request) {
         String studentId = request.pathVariable("id");
         Mono<Student> studentMono = request.bodyToMono(Student.class);
-        return ok()
+        return ServerResponse.ok()
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(studentService.updateStudent(Integer.valueOf(studentId), studentMono), Student.class);
     }
@@ -85,8 +84,7 @@ public class StudentController {
         return studentService.getStudent(Integer.valueOf(studentId))
                 .flatMap(student -> studentService
                         .deleteStudent(student)
-                        .then(ok().build()))
+                        .then(ServerResponse.ok().build()))
                 .switchIfEmpty(ServerResponse.notFound().build());
     }
-
 }
